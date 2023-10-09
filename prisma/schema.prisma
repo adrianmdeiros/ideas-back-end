@@ -6,3 +6,39 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id BigInt @id
+  name String 
+  email String? @unique
+  phone String?
+  avatarURL String
+  bond String 
+  bio String?  
+  projects Project[] 
+
+  @@map("users")
+}
+
+
+model Project {
+  id  String @id @default(uuid())
+  title String 
+  description String
+  studentsRequired Int
+  user User @relation(fields: [userId], references: [id])
+  projectCategory Category @relation(fields: [categoryId], references: [id])
+  userId BigInt @unique
+  categoryId Int @unique
+  createdAt DateTime @default(now())
+
+  @@map("projects")
+}
+
+model Category{
+  id Int @id @default(autoincrement())
+  name String 
+  projects Project[]
+
+  @@map("categories")
+}
