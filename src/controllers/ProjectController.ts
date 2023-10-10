@@ -3,15 +3,27 @@ import { database } from "../database";
 
 export class ProjectController{
     async create(req: Request, res: Response){
-        const { title, description, studentsRequired, user, projectCategory } = req.body
+        const { title, description, studentsRequired } = req.body
+        const { userId, categoryId } = req.params
+
+        const userIdBigInt = parseInt(userId)
+        const categoryIdInt = parseInt(categoryId)
 
         const savedProject = await database.project.create({
             data: {
                 title,
                 description,
                 studentsRequired,
-                user,
-                projectCategory
+                user:{
+                    connect: {
+                        id: userIdBigInt
+                    }
+                },
+                projectCategory: {
+                    connect: {
+                        id: categoryIdInt
+                    }
+                }
             }
         })
 
