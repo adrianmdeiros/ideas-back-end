@@ -30,9 +30,9 @@ model Project {
   description String
   studentsRequired Int
   user User @relation(fields: [userId], references: [id])
-  projectCategory Category @relation(fields: [categoryId], references: [id])
-  userId BigInt @unique
-  categoryId Int @unique
+  category Category @relation(fields: [categoryId], references: [id])
+  userId BigInt
+  categoryId Int 
   createdAt DateTime @default(now())
 
   @@map("projects")

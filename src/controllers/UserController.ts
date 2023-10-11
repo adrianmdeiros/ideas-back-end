@@ -13,7 +13,9 @@ BigInt.prototype.toJSON = function() {
 
 export class UserController{
     async create(req: Request, res: Response){
-        const { id, name, email, phone, avatarURL, bond, bio, projects } = req.body
+        const { id, name, email, phone, avatarURL, bond, bio } = req.body
+        
+        
 
         const user = await database.user.create({
             data: {
@@ -24,7 +26,6 @@ export class UserController{
                 avatarURL,
                 bond,
                 bio,
-                projects
             }
         })
 
