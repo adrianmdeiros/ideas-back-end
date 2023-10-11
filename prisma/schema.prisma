@@ -1,3 +1,5 @@
+
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,11 +9,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id BigInt @id
   name String 
   email String? @unique
-  phone String?
+  phone String? @unique
   avatarURL String
   bond String 
   bio String?  
@@ -23,7 +26,7 @@ model User {
 
 model Project {
   id  String @id @default(uuid())
-  title String 
+  title String @unique
   description String
   studentsRequired Int
   user User @relation(fields: [userId], references: [id])
@@ -37,7 +40,7 @@ model Project {
 
 model Category{
   id Int @id @default(autoincrement())
-  name String 
+  name String @unique
   projects Project[]
 
   @@map("categories")

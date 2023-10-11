@@ -3,11 +3,8 @@ import { database } from "../database";
 
 export class ProjectController{
     async create(req: Request, res: Response){
-        const { title, description, studentsRequired } = req.body
-        const { userId, categoryId } = req.params
+        const { title, description, studentsRequired, userId, categoryId } = req.body
 
-        const userIdBigInt = parseInt(userId)
-        const categoryIdInt = parseInt(categoryId)
 
         const savedProject = await database.project.create({
             data: {
@@ -16,23 +13,23 @@ export class ProjectController{
                 studentsRequired,
                 user:{
                     connect: {
-                        id: userIdBigInt
+                        id: userId
                     }
                 },
                 projectCategory: {
                     connect: {
-                        id: categoryIdInt
+                        id: categoryId
                     }
                 }
             }
         })
 
-        return res.json(savedProject)
+        return res.status(201).json(savedProject)
     }
 
     async read(req: Request, res: Response){
         const projects = await database.project.findMany()
-        res.json(projects)
+        res.status(200).json(projects)
     }
 
     async update(req: Request, res: Response){
@@ -52,7 +49,7 @@ export class ProjectController{
             }
         })
 
-        return res.json(updatedProject)
+        return res.status(200).json(updatedProject)
     }
     
     async delete(req: Request, res: Response){
@@ -64,6 +61,6 @@ export class ProjectController{
             }
         })
 
-        return res.json(deletedProject)
+        return res.status(200).json(deletedProject)
     }
 }

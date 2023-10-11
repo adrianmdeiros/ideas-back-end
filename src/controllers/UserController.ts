@@ -1,6 +1,15 @@
 import { Response, Request } from 'express'
 import { database } from '../database'
-import { User } from '@prisma/client'
+
+// Serializar BigInt - bugfix
+declare global{
+    interface BigInt {
+        toJSON(): string
+    }
+}
+BigInt.prototype.toJSON = function() {       
+    return this.toString()
+}
 
 export class UserController{
     async create(req: Request, res: Response){
@@ -8,17 +17,19 @@ export class UserController{
 
         const user = await database.user.create({
             data: {
-                id: id,
-                name: name,
-                email: email,
-                phone: phone,
-                avatarURL: avatarURL,
-                bond: bond,
-                bio: bio,
-                projects: projects
+                id,
+                name,
+                email,
+                phone,
+                avatarURL,
+                bond,
+                bio,
+                projects
             }
         })
 
-        return res.json(user)
+
+        return res.status(201).json(user)
     }
+
 }
