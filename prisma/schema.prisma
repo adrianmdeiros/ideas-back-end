@@ -31,7 +31,7 @@ model Project {
   studentsRequired Int
   user User @relation(fields: [userId], references: [id])
   category Category @relation(fields: [categoryId], references: [id])
-  userId BigInt
+  userId BigInt 
   categoryId Int 
   createdAt DateTime @default(now())
 

@@ -6,6 +6,7 @@ const userRouter = Router()
 const userController = new UserController()
 
 userRouter.post('/users', userController.create)
+userRouter.get('/users', userController.read)
 
 
 export default userRouter

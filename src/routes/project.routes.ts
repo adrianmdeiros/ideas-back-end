@@ -6,9 +6,10 @@ const projectRouter = Router()
 const projectController = new ProjectController()
 
 
+
+
 projectRouter.get('/projects', projectController.read)
-projectRouter.get('/projects?categoryId=:id', projectController.readProjectsByCategory)
-projectRouter.post('/projects/:userId/:categoryId', projectController.create)
+projectRouter.post('/projects', projectController.create)
 projectRouter.put('/projects/:id', projectController.update)
 projectRouter.delete('/projects/:id', projectController.delete)
 
