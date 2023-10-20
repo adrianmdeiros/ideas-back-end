@@ -41,8 +41,50 @@ export class ProjectController{
     }
 
     async read(req: Request, res: Response){
+        const { userId } = req.query
         const { categoryId } = req.query
 
+        if (userId !== undefined && typeof userId === 'string'){
+            const userIdInt = parseInt( userId )
+
+            if(!isNaN(userIdInt)){
+                try{
+                    const projectsByCategory = await database.project.findMany({
+                        where: {
+                            user:{
+                                id: userIdInt
+                            }
+                        }, 
+                        select: {
+                            id: true,
+                            title: true,
+                            description: true,
+                            studentsRequired: true,
+                            category: true,
+                            user: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    avatarURL: true
+                                }
+                            }     
+                        }
+                    })  
+
+                    if(projectsByCategory.length === 0){
+                        return res.status(StatusCodes.NOT_FOUND).json({
+                            message: "User doesn't exists or has no projects!"
+                        })
+                    }
+                    return res.status(StatusCodes.OK).json(projectsByCategory)
+                    
+                }catch(e){
+                    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()
+                }
+            }
+        }
+
+        
         if (categoryId !== undefined && typeof categoryId === 'string'){
             const categoryIdInt = parseInt( categoryId )
 
@@ -101,15 +143,16 @@ export class ProjectController{
                 }
             })
             if(projects.length === 0){
-                return res.status(StatusCodes.NOT_FOUND).json()
+                return res.status(StatusCodes.NOT_FOUND).json({
+                    message: "Cannot find projects!"
+                })
             }
             return res.status(StatusCodes.OK).json(projects)
         }catch(e){  
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()
         }   
 
-        
-
+    
     }
 
 
