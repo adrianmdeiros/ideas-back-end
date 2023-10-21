@@ -50,4 +50,48 @@ export class UserController{
         }
     }
 
+    async readContacts(req: Request, res: Response){
+        const { id } = req.params
+        try{
+            const userContacts = await database.user.findFirst({
+                where:{
+                    id: Number(id)
+                },
+                select: {
+                    email: true,
+                    phone: true
+                }
+            })
+            if(!userContacts){
+                res.status(StatusCodes.NOT_FOUND).json({
+                    message: "Cannot find users!"
+                })
+            }
+            return res.status(StatusCodes.OK).json(userContacts)
+        }catch(e){
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()  
+        }
+    }
+
+    async update(req: Request, res: Response){
+        const { email, phone } = req.body
+        const { id } = req.params
+        
+        try{
+            const updatedProject = await database.user.update({
+                where: {
+                    id: Number(id)
+                },
+                data:{
+                    email,
+                    phone
+                }
+            })
+    
+            return res.status(StatusCodes.OK).json(updatedProject)
+        }catch(e){
+            return res.status(StatusCodes.BAD_REQUEST).json()
+        }
+    }
+
 }

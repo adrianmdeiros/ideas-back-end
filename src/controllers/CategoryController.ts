@@ -32,7 +32,7 @@ export class CategoryController {
             })
             if(categories.length === 0){
                 return res.status(StatusCodes.NOT_FOUND).json({
-                    message: 'Cannor find categories!'
+                    message: 'Cannot find categories!'
                 })
             }
             return res.status(StatusCodes.OK).json(categories)
