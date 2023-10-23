@@ -12,7 +12,7 @@ export class ProjectController{
                     title,
                     description,
                     studentsRequired,
-                    user:{
+                    user: {
                         connect: {
                             id: userId,
                         }
@@ -24,8 +24,28 @@ export class ProjectController{
                     }
                 }
             })
-    
-            return res.status(StatusCodes.CREATED).json(savedProject)
+            
+            const requestToCreateAPost = await database.project.findUnique({
+                where:{
+                    id: savedProject.id
+                },
+                select:{
+                    id: true,
+                    title: true,
+                    description: true,
+                    studentsRequired: true,
+                    category: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            avatarURL: true
+                        }
+                    }
+                }
+            })
+            
+            return res.status(StatusCodes.CREATED).json(requestToCreateAPost)
         }catch(err){
             if(userId === null || categoryId === null){
                 return res.status(StatusCodes.BAD_REQUEST).json({
