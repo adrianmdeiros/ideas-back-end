@@ -49,12 +49,15 @@ export class UserController{
     async read(req: Request, res: Response){
         try{
             const users = await database.user.findMany({
-                include:{
-                    course: {
-                        select:{
-                            name: true
-                        }
-                    }
+                select:{
+                    id: true,
+                    name: true,
+                    email: true,
+                    phone: true,
+                    avatarURL: true,
+                    bond: true,
+                    courseId: false,
+                    course: true
                 }
             })
             if(users.length === 0){
@@ -64,7 +67,7 @@ export class UserController{
             }
             return res.status(StatusCodes.OK).json(users)
         }catch(e){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()  
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)  
         }
     }
 
@@ -87,7 +90,7 @@ export class UserController{
             }
             return res.status(StatusCodes.OK).json(userContacts)
         }catch(e){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()  
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)  
         }
     }
 
@@ -108,7 +111,7 @@ export class UserController{
     
             return res.status(StatusCodes.OK).json(updatedProject)
         }catch(e){
-            return res.status(StatusCodes.BAD_REQUEST).json()
+            return res.status(StatusCodes.BAD_REQUEST).json(e)
         }
     }
 

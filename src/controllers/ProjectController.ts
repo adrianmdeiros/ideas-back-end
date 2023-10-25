@@ -56,8 +56,7 @@ export class ProjectController {
             }
             return res.status(StatusCodes.CONFLICT).json({
                 message: "Project already exists!"
-            }
-            )
+            })
         }
 
     }
@@ -99,7 +98,7 @@ export class ProjectController {
                 return res.status(StatusCodes.OK).json(projectsByUser)
 
             } catch (e) {
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)
             }
         }
         
@@ -138,7 +137,7 @@ export class ProjectController {
                 return res.status(StatusCodes.OK).json(projectsByUserCourse)
 
             } catch (e) {
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)
             }
         }
 
@@ -176,7 +175,7 @@ export class ProjectController {
                 return res.status(StatusCodes.OK).json(projectsByCategory)
 
             } catch (e) {
-                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()
+                return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)
             }
         }
 
@@ -232,7 +231,7 @@ export class ProjectController {
             }
             return res.status(StatusCodes.OK).json(projects)
         } catch (e) {
-            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json()
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)
         }
 
 
@@ -292,7 +291,7 @@ export class ProjectController {
 
             return res.status(StatusCodes.OK).json(deletedProject)
         } catch (e) {
-            return res.status(StatusCodes.BAD_REQUEST).json()
+            return res.status(StatusCodes.BAD_REQUEST).json(e)
         }
     }
 }
