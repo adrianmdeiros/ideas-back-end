@@ -1,51 +1,57 @@
-
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
-
 model User {
-  id BigInt @id
-  name String 
-  email String? @unique
-  phone String? @unique
+  id        BigInt    @id
+  name      String
+  email     String?   @unique
+  phone     String?   @unique
   avatarURL String
-  bond String 
-  bio String?  
-  projects Project[] 
+  bond      String
+  courseId  Int
+  projects  Project[]
+
+  course    Course?  @relation(fields: [courseId], references: [id])
 
   @@map("users")
+  @@index([courseId])
 }
-
 
 model Project {
-  id  String @id @default(uuid())
-  title String @unique
-  description String
+  id               String   @id @default(uuid())
+  title            String   @unique
+  description      String
   studentsRequired Int
-  user User @relation(fields: [userId], references: [id])
-  category Category @relation(fields: [categoryId], references: [id])
-  userId BigInt 
-  categoryId Int 
-  createdAt DateTime @default(now())
+  userId           BigInt
+  categoryId       Int
+  createdAt        DateTime @default(now())
+  user             User     @relation(fields: [userId], references: [id])
+  category         Category @relation(fields: [categoryId], references: [id])
+  
 
-  @@map("projects")
   @@index([userId])
   @@index([categoryId])
+  @@map("projects")
 }
 
-model Category{
-  id Int @id @default(autoincrement())
-  name String @unique
-  color String? @unique
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  color    String    @unique
   projects Project[]
 
   @@map("categories")
+}
+
+model Course {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  users User[]
 }

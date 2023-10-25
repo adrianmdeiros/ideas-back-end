@@ -5,12 +5,13 @@ import { StatusCodes } from 'http-status-codes'
 
 export class CategoryController {
     async create(req: Request, res: Response){
-    const { name } = req.body;
+    const { name, color } = req.body;
 
     try{
         const newCategory = await database.category.create({
             data: { 
-                name
+                name,
+                color
             }
         })
 
@@ -31,13 +32,14 @@ export class CategoryController {
                 }
             })
             if(categories.length === 0){
+                
                 return res.status(StatusCodes.NOT_FOUND).json({
                     message: 'Cannot find categories!'
                 })
             }
             return res.status(StatusCodes.OK).json(categories)
         }catch(err){
-            
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err)
         }
     }
 
