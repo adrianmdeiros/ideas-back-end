@@ -48,7 +48,15 @@ export class UserController{
 
     async read(req: Request, res: Response){
         try{
-            const users = await database.user.findMany()
+            const users = await database.user.findMany({
+                include:{
+                    course: {
+                        select:{
+                            name: true
+                        }
+                    }
+                }
+            })
             if(users.length === 0){
                 res.status(StatusCodes.NOT_FOUND).json({
                     message: "Cannot find users!"
