@@ -51,13 +51,13 @@ export class ProjectController {
         })
 
         return res.status(StatusCodes.CREATED).json(requestToCreateAPost)
-    }
+    }                       
 
     async read(req: Request, res: Response) {
         const { userid } = req.query
         const { categoryid } = req.query
         const { usercourseid } = req.query
-
+   
         if (userid) {
             const projectsByUser = await database.project.findMany({
                 where: {
@@ -181,7 +181,7 @@ export class ProjectController {
     }
 
     async update(req: Request, res: Response) {
-        const { title, description, studentsRequired } = req.body
+        const { title, description, studentsRequired, categoryid } = req.body
         const { id } = req.params
 
         const updatedProject = await database.project.update({
@@ -191,7 +191,8 @@ export class ProjectController {
             data: {
                 title,
                 description,
-                studentsRequired
+                studentsRequired,
+                categoryId: categoryid
             }
         })
 

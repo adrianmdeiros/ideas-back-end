@@ -46,7 +46,17 @@ export class UserController{
     }
 
     async read(req: Request, res: Response){
-   
+    const { id } = req.params
+
+    if(id){
+        const userByid = await database.user.findFirst({
+            where: {
+                id: Number(id)
+            }
+        })
+        return res.status(StatusCodes.OK).json(userByid)
+    }
+    
             const users = await database.user.findMany({
                 select:{
                     id: true,
