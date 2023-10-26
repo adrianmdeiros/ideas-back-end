@@ -1,6 +1,7 @@
 import { Response, Request } from 'express'
 import { database } from '../database'
 import { StatusCodes } from 'http-status-codes'
+import { ApiError } from '../helpers/ApiError'
 
 // Serializar BigInt - bugfix
 declare global{
@@ -16,7 +17,9 @@ export class UserController{
     async create(req: Request, res: Response){
         const { id, name, email, phone, avatarURL, bond, course } = req.body
         
-        try{
+        if(!id){
+            throw new ApiError('ID is required.', StatusCodes.BAD_REQUEST)
+        }
             const user = await database.user.create({
                 data: {
                     id,
@@ -39,15 +42,11 @@ export class UserController{
                 }
             })
             return res.status(StatusCodes.CREATED).json(user)
-        }catch(e){
-            return res.status(StatusCodes.CONFLICT).json({
-                message: 'User already exists!'
-            })
-        }
+        
     }
 
     async read(req: Request, res: Response){
-        try{
+   
             const users = await database.user.findMany({
                 select:{
                     id: true,
@@ -61,14 +60,10 @@ export class UserController{
                 }
             })
             if(users.length === 0){
-                res.status(StatusCodes.NOT_FOUND).json({
-                    message: "Cannot find users!"
-                })
+                throw new ApiError('Cannot find users.', StatusCodes.NOT_FOUND)
             }
             return res.status(StatusCodes.OK).json(users)
-        }catch(e){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)  
-        }
+        
     }
 
     async readContacts(req: Request, res: Response){
@@ -84,9 +79,7 @@ export class UserController{
                 }
             })
             if(!userContacts){
-                res.status(StatusCodes.NOT_FOUND).json({
-                    message: "Cannot find users!"
-                })
+                throw new ApiError('Cannot find user contacts.', StatusCodes.NOT_FOUND)
             }
             return res.status(StatusCodes.OK).json(userContacts)
         }catch(e){
@@ -95,12 +88,11 @@ export class UserController{
     }
 
     async update(req: Request, res: Response){
-        const { email, phone } = req.body
-        const { id } = req.params
+    const { email, phone } = req.body
+    const { id } = req.params
         
-        try{
-            const updatedProject = await database.user.update({
-                where: {
+    const updatedProject = await database.user.update({
+        where: {
                     id: Number(id)
                 },
                 data:{
@@ -110,9 +102,7 @@ export class UserController{
             })
     
             return res.status(StatusCodes.OK).json(updatedProject)
-        }catch(e){
-            return res.status(StatusCodes.BAD_REQUEST).json(e)
-        }
+        
     }
 
 }
