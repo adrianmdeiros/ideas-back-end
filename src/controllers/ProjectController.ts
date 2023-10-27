@@ -57,7 +57,43 @@ export class ProjectController {
         const { userid } = req.query
         const { categoryid } = req.query
         const { usercourseid } = req.query
-   
+        
+        if(usercourseid && categoryid) {
+            const projectsByUserCourseAndCategoryId = await database.project.findMany({
+                where:{
+                    user:{
+                        course:{
+                            id: Number(usercourseid)                            
+                        }
+                    },
+                    AND:{
+                        category:{
+                            id: Number(categoryid)
+                        }
+                    }
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    studentsRequired: true,
+                    category: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            avatarURL: true,
+                            course: true
+                        }
+                    }
+                }
+            })
+            if (projectsByUserCourseAndCategoryId.length === 0) {
+                throw new ApiError('Cannot find projects for this category for your course.', StatusCodes.NOT_FOUND)
+            }
+            return res.status(StatusCodes.OK).json(projectsByUserCourseAndCategoryId)
+        }
+
         if (userid) {
             const projectsByUser = await database.project.findMany({
                 where: {

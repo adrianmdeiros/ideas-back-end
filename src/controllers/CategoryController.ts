@@ -25,7 +25,7 @@ export class CategoryController {
         
             const categories = await database.category.findMany({
                 orderBy:{
-                    id: 'asc'
+                    id: 'desc'
                 }
             })
             if(categories.length === 0){
