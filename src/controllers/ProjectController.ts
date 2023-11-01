@@ -54,10 +54,12 @@ export class ProjectController {
     }                       
 
     async read(req: Request, res: Response) {
+        const { id } = req.params
         const { userid } = req.query
         const { categoryid } = req.query
         const { usercourseid } = req.query
         
+
         if(usercourseid && categoryid) {
             const projectsByUserCourseAndCategoryId = await database.project.findMany({
                 where:{
@@ -92,6 +94,34 @@ export class ProjectController {
                 throw new ApiError('Cannot find projects for this category for your course.', StatusCodes.NOT_FOUND)
             }
             return res.status(StatusCodes.OK).json(projectsByUserCourseAndCategoryId)
+        }
+
+        if(id){
+            const projectById = await database.project.findFirst({
+                where: {
+                    id: id
+                },
+                select: {
+                    id: true,
+                    title: true,
+                    description: true,
+                    studentsRequired: true,
+                    category: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            avatarURL: true,
+                            course: true
+                        }
+                    }
+                }
+            })
+
+            if(!projectById){
+                throw new ApiError('Cannot find any project for this id.', StatusCodes.NOT_FOUND)
+            }
+            return res.status(StatusCodes.OK).json(projectById)
         }
 
         if (userid) {
