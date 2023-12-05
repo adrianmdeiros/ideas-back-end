@@ -25,7 +25,7 @@ async function main() {
             },
             {
                 id: 5,
-                name: "OUTRO",
+                name: "OUTROS",
                 color: "#909090"
             },
         ]
