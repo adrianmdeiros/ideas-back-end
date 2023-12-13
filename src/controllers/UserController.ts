@@ -15,7 +15,7 @@ BigInt.prototype.toJSON = function() {
 
 export class UserController{
     async create(req: Request, res: Response){
-        const { id, name, email, phone, avatarURL, bond, course } = req.body
+        const { id, name, email, phone, bond, course } = req.body
         
         if(!id){
             throw new ApiError('ID is required.', StatusCodes.BAD_REQUEST)
@@ -26,7 +26,6 @@ export class UserController{
                     name,
                     email,
                     phone,
-                    avatarURL,
                     bond,
                     course: {
                         connectOrCreate: {
@@ -63,7 +62,6 @@ export class UserController{
                     name: true,
                     email: true,
                     phone: true,
-                    avatarURL: true,
                     bond: true,
                     courseId: false,
                     course: true
