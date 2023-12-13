@@ -43,7 +43,6 @@ export class ProjectController {
                     select: {
                         id: true,
                         name: true,
-                        avatarURL: true,
                         course: true
                     }
                 }
@@ -84,7 +83,6 @@ export class ProjectController {
                         select: {
                             id: true,
                             name: true,
-                            avatarURL: true,
                             course: true
                         }
                     }
@@ -111,7 +109,6 @@ export class ProjectController {
                         select: {
                             id: true,
                             name: true,
-                            avatarURL: true,
                             course: true
                         }
                     }
@@ -141,7 +138,6 @@ export class ProjectController {
                         select: {
                             id: true,
                             name: true,
-                            avatarURL: true,
                             course: true
                         }
                     }
@@ -174,7 +170,6 @@ export class ProjectController {
                         select: {
                             id: true,
                             name: true,
-                            avatarURL: true,
                             course: true,
                         }
                     }
@@ -206,7 +201,6 @@ export class ProjectController {
                         select: {
                             id: true,
                             name: true,
-                            avatarURL: true,
                             course: true
                         }
                     }
@@ -231,7 +225,6 @@ export class ProjectController {
                     select: {
                         id: true,
                         name: true,
-                        avatarURL: true,
                         course: true
                     }
                 }
@@ -276,7 +269,6 @@ export class ProjectController {
                     select: {
                         id: true,
                         name: true,
-                        avatarURL: true,
                         course: true
                     }
                 }
