@@ -5,8 +5,8 @@ async function main() {
         data: [
             {
                 id: 1,
-                name: "PIBIC",
-                color: "#2F9E41"
+                name: "OUTROS",
+                color: "#909090"
             },
             {
                 id: 2,
@@ -20,14 +20,19 @@ async function main() {
             },
             {
                 id: 4,
-                name: "MONOGRAFIA",
-                color: "#AD00FF"
+                name: "PIBIC",
+                color: "#2F9E41"
             },
             {
                 id: 5,
-                name: "OUTROS",
-                color: "#909090"
+                name: "PIVITI",
+                color: '#F5D100'
             },
+            {
+                id: 6,
+                name: "MONOGRAFIA",
+                color: "#AD00FF"
+            }
         ]
     })
     console.log('Seeded', categories)

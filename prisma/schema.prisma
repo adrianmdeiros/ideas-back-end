@@ -16,8 +16,8 @@ model User {
   // avatarURL String
   bond      String
   courseId  Int
-  projects  Project[]
 
+  projects  Project[]
   course    Course?  @relation(fields: [courseId], references: [id])
 
   @@map("users")
@@ -29,9 +29,12 @@ model Project {
   title            String   @unique
   description      String   @db.VarChar(1000)
   studentsRequired Int
+  amountUsersInterested BigInt? @default(0)
+  modality         String?
   userId           BigInt
   categoryId       Int
   createdAt        DateTime @default(now())
+
   user             User     @relation(fields: [userId], references: [id])
   category         Category @relation(fields: [categoryId], references: [id])
   
@@ -45,6 +48,7 @@ model Category {
   id       Int       @id @default(autoincrement())
   name     String    @unique
   color    String    @unique
+
   projects Project[]
 
   @@map("categories")
@@ -53,5 +57,6 @@ model Category {
 model Course {
   id       Int       @id @default(autoincrement())
   name     String    @unique
+
   users User[]
 }

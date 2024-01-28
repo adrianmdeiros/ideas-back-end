@@ -39,11 +39,10 @@ export class CategoryController {
     async update(req: Request, res: Response){
         const { id } = req.params
         const { name, color } = req.body
-        const categoryIdInt = parseInt(id)
 
             const updatedCategories = await database.category.update({
                 where: {
-                    id: categoryIdInt
+                    id: Number(id)
                 },
                 data:{
                     name,

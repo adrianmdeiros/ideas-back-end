@@ -5,17 +5,29 @@ import { ApiError } from "../helpers/ApiError";
 
 export class ProjectController {
     async create(req: Request, res: Response) {
-        const { title, description, studentsRequired, userid, categoryid } = req.body
+        const { title, description, studentsRequired, modality, userid, categoryid } = req.body
 
         if (!userid || !categoryid) {
             throw new ApiError('userid or categoryid is missing!', StatusCodes.BAD_REQUEST)
         }
+
+        const user = await database.user.findFirst({
+            where:{
+                id: userid
+            }
+        })
+
+        if(!user){
+            throw new ApiError('User not found.', StatusCodes.NOT_FOUND)
+        }
+
 
         const savedProject = await database.project.create({
             data: {
                 title,
                 description,
                 studentsRequired,
+                modality,
                 user: {
                     connect: {
                         id: userid,
@@ -38,6 +50,8 @@ export class ProjectController {
                 title: true,
                 description: true,
                 studentsRequired: true,
+                modality: true,
+                amountUsersInterested: true,
                 category: true,
                 user: {
                     select: {
@@ -57,6 +71,7 @@ export class ProjectController {
         const { userid } = req.query
         const { categoryid } = req.query
         const { usercourseid } = req.query
+        const { modality } = req.query
         
 
         if(usercourseid && categoryid) {
@@ -78,6 +93,8 @@ export class ProjectController {
                     title: true,
                     description: true,
                     studentsRequired: true,
+                    modality: true,
+                    amountUsersInterested: true,
                     category: true,
                     user: {
                         select: {
@@ -104,6 +121,8 @@ export class ProjectController {
                     title: true,
                     description: true,
                     studentsRequired: true,
+                    modality: true,
+                    amountUsersInterested: true,
                     category: true,
                     user: {
                         select: {
@@ -133,6 +152,8 @@ export class ProjectController {
                     title: true,
                     description: true,
                     studentsRequired: true,
+                    modality: true,
+                    amountUsersInterested: true,
                     category: true,
                     user: {
                         select: {
@@ -165,12 +186,14 @@ export class ProjectController {
                     title: true,
                     description: true,
                     studentsRequired: true,
+                    modality: true,
+                    amountUsersInterested: true,
                     category: true,
                     user: {
                         select: {
                             id: true,
                             name: true,
-                            course: true,
+                            course: true
                         }
                     }
                 }
@@ -196,6 +219,8 @@ export class ProjectController {
                     title: true,
                     description: true,
                     studentsRequired: true,
+                    modality: true,
+                    amountUsersInterested: true,
                     category: true,
                     user: {
                         select: {
@@ -214,12 +239,43 @@ export class ProjectController {
             return res.status(StatusCodes.OK).json(projectsByCategory)
         }
         
+        if(modality){
+            const projectsByModality = await database.project.findMany({
+                where:{
+                    modality: modality.toString()
+                },
+                select:{
+                    id: true,
+                    title: true,
+                    description: true,
+                    studentsRequired: true,
+                    modality: true,
+                    amountUsersInterested: true,
+                    category: true,
+                    user: {
+                        select: {
+                            id: true,
+                            name: true,
+                            course: true
+                        }
+                    }
+                }
+            })
+            if (projectsByModality.length === 0) {
+                throw new ApiError('Cannot find projects for this modality.', StatusCodes.NOT_FOUND)
+            }
+            return res.status(StatusCodes.OK).json(projectsByModality)
+
+        }
+
         const projects = await database.project.findMany({
             select: {
                 id: true,
                 title: true,
                 description: true,
                 studentsRequired: true,
+                modality: true,
+                amountUsersInterested: true,
                 category: true,
                 user: {
                     select: {
@@ -240,8 +296,35 @@ export class ProjectController {
     }
 
     async update(req: Request, res: Response) {
-        const { title, description, studentsRequired, categoryid } = req.body
         const { id } = req.params
+        const { title, description, studentsRequired, modality, categoryid } = req.body
+        const { increment } = req.params
+
+        if(increment && increment.toLowerCase() === 'increment'){
+            const updatedAmountUsersInterested = await database.project.update({
+                where: {
+                    id
+                },
+                data: {
+                    amountUsersInterested: { increment: 1 }
+                }
+            })
+
+            const requestToUpdateAmountUsersInterestedInPost = await database.project.findUnique({
+                where: {
+                    id: updatedAmountUsersInterested.id
+                },
+                select: {
+                    amountUsersInterested: true
+                }   
+            })
+
+            const numericResponse = Number(requestToUpdateAmountUsersInterestedInPost?.amountUsersInterested)
+
+            return res.status(StatusCodes.OK).json({ amountUsersInterested: numericResponse })
+
+        }
+
 
         const updatedProject = await database.project.update({
             where: {
@@ -251,6 +334,7 @@ export class ProjectController {
                 title,
                 description,
                 studentsRequired,
+                modality,
                 categoryId: categoryid
             }
         })
@@ -264,6 +348,8 @@ export class ProjectController {
                 title: true,
                 description: true,
                 studentsRequired: true,
+                modality: true,
+                amountUsersInterested: true,
                 category: true,
                 user: {
                     select: {
