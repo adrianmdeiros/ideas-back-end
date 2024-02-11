@@ -7,13 +7,16 @@ import { errorMiddleware } from './middleware/error'
 
 const app = express()
 const port = process.env.PORT || 3000
+const corsOptions = {
+    origin: 'https://projif.vercel.app',
+    optionsSuccessStatus: 200
+}
 
 app.get('/', (req, res) => res.send('API do sistema projif.'))
 
 app.use(express.json())
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(routes)
-
 app.use(errorMiddleware)
 
 app.listen(port, () => {

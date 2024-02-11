@@ -5,52 +5,15 @@ import { StatusCodes } from 'http-status-codes'
 import { ApiError } from "../helpers/ApiError";
 
 export class CategoryController {
-    async create(req: Request, res: Response){
-    const { name, color } = req.body;
-
-    
-        const newCategory = await database.category.create({
-            data: { 
-                name,
-                color
+    async read(req: Request, res: Response) {
+        const categories = await database.category.findMany({
+            orderBy: {
+                id: 'desc'
             }
         })
-
-        return res.status(StatusCodes.CREATED).json(newCategory);
-    
-    
+        if (categories.length === 0) {
+            throw new ApiError('Cannot find categories.', StatusCodes.NOT_FOUND)
+        }
+        return res.status(StatusCodes.OK).json(categories)
     }
-    
-    async read(req: Request, res: Response){
-        
-            const categories = await database.category.findMany({
-                orderBy:{
-                    id: 'desc'
-                }
-            })
-            if(categories.length === 0){
-                
-               throw new ApiError('Cannot find categories.', StatusCodes.NOT_FOUND)
-            }
-            return res.status(StatusCodes.OK).json(categories)
-        
-    }
-
-    async update(req: Request, res: Response){
-        const { id } = req.params
-        const { name, color } = req.body
-
-            const updatedCategories = await database.category.update({
-                where: {
-                    id: Number(id)
-                },
-                data:{
-                    name,
-                    color
-                }
-            })
-            return res.send(StatusCodes.OK).json(updatedCategories)
-        
-    }
-
 }

@@ -89,13 +89,17 @@ export class ProjectController {
                     }
                 },
                 select: {
-                    id: true,
                     title: true,
                     description: true,
                     studentsRequired: true,
                     modality: true,
                     amountUsersInterested: true,
-                    category: true,
+                    category: {
+                        select: {
+                            name: true,
+                            color: true
+                        }
+                    },
                     user: {
                         select: {
                             id: true,
@@ -116,8 +120,7 @@ export class ProjectController {
                 where: {
                     id: id
                 },
-                select: {
-                    id: true,
+                select: {   
                     title: true,
                     description: true,
                     studentsRequired: true,
@@ -125,8 +128,7 @@ export class ProjectController {
                     amountUsersInterested: true,
                     category: true,
                     user: {
-                        select: {
-                            id: true,
+                        select: { 
                             name: true,
                             course: true
                         }
@@ -154,7 +156,12 @@ export class ProjectController {
                     studentsRequired: true,
                     modality: true,
                     amountUsersInterested: true,
-                    category: true,
+                    category: {
+                        select:{
+                            name: true,
+                            color: true
+                        }
+                    },
                     user: {
                         select: {
                             id: true,
@@ -182,13 +189,17 @@ export class ProjectController {
                     }
                 },
                 select: {
-                    id: true,
                     title: true,
                     description: true,
                     studentsRequired: true,
                     modality: true,
                     amountUsersInterested: true,
-                    category: true,
+                    category: {
+                        select: {
+                            name: true,
+                            color: true
+                        }
+                    },
                     user: {
                         select: {
                             id: true,
@@ -215,16 +226,19 @@ export class ProjectController {
                     }
                 },
                 select: {
-                    id: true,
                     title: true,
                     description: true,
                     studentsRequired: true,
                     modality: true,
                     amountUsersInterested: true,
-                    category: true,
+                    category: {
+                        select: {
+                            name: true,
+                            color: true
+                        }
+                    },
                     user: {
                         select: {
-                            id: true,
                             name: true,
                             course: true
                         }
@@ -245,13 +259,17 @@ export class ProjectController {
                     modality: modality.toString()
                 },
                 select:{
-                    id: true,
                     title: true,
                     description: true,
                     studentsRequired: true,
                     modality: true,
                     amountUsersInterested: true,
-                    category: true,
+                    category: {
+                        select: {
+                            name: true,
+                            color: true
+                        }
+                    },
                     user: {
                         select: {
                             id: true,
@@ -270,16 +288,20 @@ export class ProjectController {
 
         const projects = await database.project.findMany({
             select: {
-                id: true,
                 title: true,
                 description: true,
                 studentsRequired: true,
                 modality: true,
                 amountUsersInterested: true,
-                category: true,
+                category: {
+                    select: {
+                        name: true,
+                        color: true
+                    }
+                },
                 user: {
                     select: {
-                        id: true,
+                        
                         name: true,
                         course: true
                     }
@@ -350,7 +372,12 @@ export class ProjectController {
                 studentsRequired: true,
                 modality: true,
                 amountUsersInterested: true,
-                category: true,
+                category: {
+                    select:{
+                        name: true,
+                        color: true
+                    }
+                },
                 user: {
                     select: {
                         id: true,

@@ -51,6 +51,13 @@ export class UserController{
         const userByid = await database.user.findFirst({
             where: {
                 id: Number(id)
+            },
+            select: {
+                    name: true,
+                    email: true,
+                    phone: true,
+                    bond: true,
+                    courseId: true
             }
         })
         return res.status(StatusCodes.OK).json(userByid)
@@ -58,12 +65,11 @@ export class UserController{
     
             const users = await database.user.findMany({
                 select:{
-                    id: true,
                     name: true,
                     email: true,
                     phone: true,
                     bond: true,
-                    courseId: false,
+                    courseId: true,
                     course: true
                 }
             })
@@ -99,7 +105,7 @@ export class UserController{
     const { email, phone } = req.body
     const { id } = req.params
         
-    const updatedProject = await database.user.update({
+    const updatedContact = await database.user.update({
         where: {
                     id: Number(id)
                 },
@@ -109,7 +115,7 @@ export class UserController{
                 }
             })
     
-            return res.status(StatusCodes.OK).json(updatedProject)
+            return res.status(StatusCodes.OK).json(updatedContact)
         
     }
 
