@@ -1,9 +1,8 @@
 import 'express-async-errors'
-import express from 'express'
 import cors from 'cors'
-import routes from './routes'
+import express from 'express'
 import { errorMiddleware } from './middleware/error'
-
+import routes from './routes'
 
 const app = express()
 const port = process.env.PORT || 3000

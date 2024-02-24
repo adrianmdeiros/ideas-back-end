@@ -4,87 +4,86 @@ import { StatusCodes } from 'http-status-codes'
 import { ApiError } from '../helpers/ApiError'
 
 // Serializar BigInt - bugfix
-declare global{
+declare global {
     interface BigInt {
         toJSON(): string
     }
 }
-BigInt.prototype.toJSON = function() {       
+BigInt.prototype.toJSON = function () {
     return this.toString()
 }
 
-export class UserController{
-    async create(req: Request, res: Response){
+export class UserController {
+    async create(req: Request, res: Response) {
         const { id, name, email, phone, bond, course } = req.body
-        
-        if(!id){
+
+        if (!id) {
             throw new ApiError('ID is required.', StatusCodes.BAD_REQUEST)
         }
-            const user = await database.user.create({
-                data: {
-                    id,
-                    name,
-                    email,
-                    phone,
-                    bond,
-                    course: {
-                        connectOrCreate: {
-                            where: {
-                                name: course
-                            },
-                            
-                            create: {
-                                name: course
-                            }
+        const user = await database.user.create({
+            data: {
+                id,
+                name,
+                email,
+                phone,
+                bond,
+                course: {
+                    connectOrCreate: {
+                        where: {
+                            name: course
+                        },
+                        create: {
+                            name: course
                         }
                     }
                 }
-            })
-            return res.status(StatusCodes.CREATED).json(user)
-        
+            }
+        })
+        return res.status(StatusCodes.CREATED).json(user)
+
     }
 
-    async read(req: Request, res: Response){
-    const { id } = req.params
+    async read(req: Request, res: Response) {
+        const { id } = req.params
 
-    if(id){
-        const userByid = await database.user.findFirst({
-            where: {
-                id: Number(id)
-            },
-            select: {
+        if (id) {
+            const userByid = await database.user.findFirst({
+                where: {
+                    id: Number(id)
+                },
+                select: {
                     name: true,
                     email: true,
                     phone: true,
                     bond: true,
                     courseId: true
-            }
-        })
-        return res.status(StatusCodes.OK).json(userByid)
-    }
-    
-            const users = await database.user.findMany({
-                select:{
-                    name: true,
-                    email: true,
-                    phone: true,
-                    bond: true,
-                    courseId: true,
-                    course: true
                 }
             })
-            if(users.length === 0){
-                throw new ApiError('Cannot find users.', StatusCodes.NOT_FOUND)
+            return res.status(StatusCodes.OK).json(userByid)
+        }
+
+        const users = await database.user.findMany({
+            select: {
+                name: true,
+                email: true,
+                phone: true,
+                bond: true,
+                courseId: true,
+                course: true
             }
-            return res.status(StatusCodes.OK).json(users)
-        
+        })
+        if (users.length === 0) {
+            throw new ApiError('Cannot find users.', StatusCodes.NOT_FOUND)
+        }
+        return res.status(StatusCodes.OK).json(users)
+
     }
 
-    async readContacts(req: Request, res: Response){
+    async readContacts(req: Request, res: Response) {
         const { id } = req.params
-        try{
+        try {
             const userContacts = await database.user.findFirst({
-                where:{
+                where: {
                     id: Number(id)
                 },
                 select: {
@@ -92,31 +91,34 @@ export class UserController{
                     phone: true
                 }
             })
-            if(!userContacts){
+            if (!userContacts) {
                 throw new ApiError('Cannot find user contacts.', StatusCodes.NOT_FOUND)
             }
             return res.status(StatusCodes.OK).json(userContacts)
-        }catch(e){
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)  
+        } catch (e) {
+            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e)
         }
     }
 
-    async update(req: Request, res: Response){
-    const { email, phone } = req.body
-    const { id } = req.params
-        
-    const updatedContact = await database.user.update({
-        where: {
-                    id: Number(id)
-                },
-                data:{
-                    email,
-                    phone
-                }
-            })
-    
-            return res.status(StatusCodes.OK).json(updatedContact)
-        
+    async update(req: Request, res: Response) {
+        const { email, phone } = req.body
+        const { id } = req.params
+        const { auth } = req.query
+
+        if(!id){
+            throw new ApiError('Id is required.', StatusCodes.BAD_REQUEST)
+        }
+
+        const updatedContact = await database.user.update({
+            where: {
+                id: Number(id)
+            },
+            data: {
+                email,
+                phone
+            }
+        })
+        return res.status(StatusCodes.OK).json(updatedContact)
     }
 
 }
