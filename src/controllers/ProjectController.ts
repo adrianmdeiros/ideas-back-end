@@ -44,9 +44,6 @@ export class ProjectController {
 
         const [projectsList, totalProjects] = await database.$transaction([
             database.project.findMany({
-                where: {
-                    id: savedProject.id
-                },
                 select: {
                     id: true,
                     title: true,
@@ -56,9 +53,10 @@ export class ProjectController {
                     category: true,
                     user: {
                         select: {
-                            id: true,
                             name: true,
-                            course: true
+                            course: true,
+                            email: true,
+                            phone: true
                         }
                     }
                 },
@@ -107,9 +105,10 @@ export class ProjectController {
                     },
                     user: {
                         select: {
-                            id: true,
                             name: true,
-                            course: true
+                            course: true,
+                            email: true,
+                            phone: true
                         }
                     }
                 },
@@ -141,7 +140,9 @@ export class ProjectController {
                     user: {
                         select: { 
                             name: true,
-                            course: true
+                            course: true,
+                            email: true,
+                            phone: true
                         }
                     }
                 },
@@ -179,8 +180,8 @@ export class ProjectController {
                             select: {
                                 name: true,
                                 course: true,
-                                phone: true,
-                                email: true
+                                email: true,
+                                phone: true
                             }
                         }
                     },
@@ -222,7 +223,6 @@ export class ProjectController {
                         },
                         user: {
                             select: {
-                                id: true,
                                 name: true,
                                 course: true,
                                 phone: true,
@@ -303,7 +303,9 @@ export class ProjectController {
                             select: {
                                 id: true,
                                 name: true,
-                                course: true
+                                course: true,
+                                email: true,
+                                phone: true
                             }
                         }
                     },
@@ -383,9 +385,10 @@ export class ProjectController {
                     category: true,
                     user: {
                         select: {
-                            id: true,
                             name: true,
-                            course: true
+                            course: true,
+                            email: true,
+                            phone: true
                         }
                     }
                 },
@@ -422,9 +425,10 @@ export class ProjectController {
                     category: true,
                     user: {
                         select: {
-                            id: true,
                             name: true,
-                            course: true
+                            course: true,
+                            email: true,
+                            phone: true
                         }
                     }
                 },
