@@ -359,7 +359,7 @@ export class ProjectController {
         const skip = req.query.skip ?? 0
         const take = req.query.take ?? 12
 
-        const updatedProject = await database.project.update({
+        await database.project.update({
             where: {
                 id
             },
@@ -374,21 +374,13 @@ export class ProjectController {
 
         const [projectsList, totalProjects] = await database.$transaction([
             database.project.findMany({
-                where: {
-                    id: updatedProject.id
-                },
                 select: {
                     id: true,
                     title: true,
                     description: true,
                     studentsRequired: true,
                     modality: true,
-                    category: {
-                        select:{
-                            name: true,
-                            color: true
-                        }
-                    },
+                    category: true,
                     user: {
                         select: {
                             id: true,
@@ -406,7 +398,6 @@ export class ProjectController {
         const totalPages = Math.ceil(totalProjects / Number(take))
 
         return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList})
-       
     }
 
     async delete(req: Request, res: Response) {
