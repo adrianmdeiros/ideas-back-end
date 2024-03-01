@@ -2,24 +2,25 @@ import { Request, Response } from "express";
 import { database } from "../database";
 import { StatusCodes } from 'http-status-codes'
 import { ApiError } from "../helpers/ApiError";
+import { ProjectService } from "../services/ProjectService";
+import { ProjectRepository } from "../repositories/ProjectRepository";
 
 export class ProjectController {
+    
     async create(req: Request, res: Response) {
         const { title, description, studentsRequired, modality, userid, categoryid } = req.body
-        const skip = req.query.skip ?? 0
-        const take = req.query.take ?? 12
 
         if (!userid || !categoryid) {
             throw new ApiError('userid or categoryid is missing!', StatusCodes.BAD_REQUEST)
         }
 
         const user = await database.user.findFirst({
-            where:{
+            where: {
                 id: userid
             }
         })
 
-        if(!user){
+        if (!user) {
             throw new ApiError('User not found.', StatusCodes.NOT_FOUND)
         }
 
@@ -39,106 +40,54 @@ export class ProjectController {
                         id: categoryid
                     }
                 }
+            },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                studentsRequired: true,
+                modality: true,
+                category: true,
+                user: {
+                    select: {
+                        name: true,
+                        course: true,
+                        email: true,
+                        phone: true
+                    }
+                }
             }
         })
 
-        const [projectsList, totalProjects] = await database.$transaction([
-            database.project.findMany({
-                select: {
-                    id: true,
-                    title: true,
-                    description: true,
-                    studentsRequired: true,
-                    modality: true,
-                    category: true,
-                    user: {
-                        select: {
-                            name: true,
-                            course: true,
-                            email: true,
-                            phone: true
-                        }
-                    }
-                },
-                skip: Number(skip),
-                take: Number(take)
-            }),
-            database.project.count()
-        ])
+        return res.status(StatusCodes.CREATED).json(savedProject)
+    }
 
-        const totalPages = Math.ceil(totalProjects / Number(take))
-
-        return res.status(StatusCodes.CREATED).json({ totalProjects, totalPages, projectsList })
-    }                       
-
-    async read(req: Request, res: Response) {
+    public async read(req: Request, res: Response) {
         const { id } = req.params
         const { userid, categoryid, usercourseid, modality } = req.query
         const skip = req.query.skip ?? 0
         const take = req.query.take ?? 12
 
-        if(usercourseid && categoryid) {
-            const [projectsList, totalProjects] = await database.$transaction([
-            database.project.findMany({
-                where:{
-                    user:{
-                        course:{
-                            id: Number(usercourseid)                            
-                        }
-                    },
-                    AND:{
-                        category:{
-                            id: Number(categoryid)
-                        }
-                    }
+        const projectService = new ProjectService(new ProjectRepository());
+
+        if (usercourseid && categoryid) {
+            const projectsByUserCourseAndCategory = await projectService.findBy(Number(usercourseid), Number(categoryid), Number(take), Number(skip))
+            return res.status(StatusCodes.OK).json(projectsByUserCourseAndCategory)
+        }
+
+        if (id) {
+            const projectById = await database.project.findFirst({
+                where: {
+                    id: id
                 },
                 select: {
                     title: true,
                     description: true,
                     studentsRequired: true,
                     modality: true,
-                    category: {
-                        select: {
-                            name: true,
-                            color: true
-                        }
-                    },
-                    user: {
-                        select: {
-                            name: true,
-                            course: true,
-                            email: true,
-                            phone: true
-                        }
-                    }
-                },
-                take: Number(take),
-                skip: Number(skip)
-            }),
-            database.project.count()
-        ]) 
-
-            const totalPages = Math.ceil(totalProjects / Number(take))
-
-            if (projectsList.length === 0) {
-                throw new ApiError('Cannot find projects for this category for your course.', StatusCodes.NOT_FOUND)
-            }
-            return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList })
-        }
-
-        if(id){
-            const projectById = await database.project.findFirst({
-                where: {
-                    id: id
-                },
-                select: {   
-                    title: true,
-                    description: true,
-                    studentsRequired: true,
-                    modality: true,
                     category: true,
                     user: {
-                        select: { 
+                        select: {
                             name: true,
                             course: true,
                             email: true,
@@ -150,103 +99,24 @@ export class ProjectController {
                 skip: Number(skip)
             })
 
-            if(!projectById){
+            if (!projectById) {
                 throw new ApiError('Cannot find any project for this id.', StatusCodes.NOT_FOUND)
             }
             return res.status(StatusCodes.OK).json(projectById)
         }
 
         if (userid) {
-            const [projectsList, totalProjects] = await database.$transaction([
-                database.project.findMany({
-                    where: {
-                        user: {
-                            id: Number(userid)
-                        }
-                    },
-                    select: {
-                        id: true,
-                        title: true,
-                        description: true,
-                        studentsRequired: true,
-                        modality: true,
-                        category: {
-                            select:{
-                                name: true,
-                                color: true
-                            }
-                        },
-                        user: {
-                            select: {
-                                name: true,
-                                course: true,
-                                email: true,
-                                phone: true
-                            }
-                        }
-                    },
-                    take: Number(take),
-                    skip: Number(skip)
-                }),
-                database.project.count()
-            ])
-
-            const totalPages = Math.ceil(totalProjects / Number(take))
-
-            if (projectsList.length === 0) {
-                throw new ApiError('Cannot find projects for this user.', StatusCodes.NOT_FOUND)
-            }
-
-            return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList })
+            const projectsByUserId = await projectService.findByUser(Number(userid), Number(take), Number(skip))
+            return res.status(StatusCodes.OK).json(projectsByUserId)
         }
 
         if (usercourseid) {
-            const [projectsList, totalProjects] = await database.$transaction([
-                database.project.findMany({
-                    where: {
-                        user: {
-                            course: {
-                                id: Number(usercourseid)
-                            }
-                        }
-                    },
-                    select: {
-                        title: true,
-                        description: true,
-                        studentsRequired: true,
-                        modality: true,
-                        category: {
-                            select: {
-                                name: true,
-                                color: true
-                            }
-                        },
-                        user: {
-                            select: {
-                                name: true,
-                                course: true,
-                                phone: true,
-                                email: true
-                            }
-                        }
-                    },
-                    take: Number(take),
-                    skip: Number(skip)
-                }),
-                database.project.count()
-            ])
-            
-            const totalPages = Math.ceil(totalProjects / Number(take))
-            
-            if (projectsList.length === 0) {
-                throw new ApiError("Cannor find projects for this usercourse.", StatusCodes.NOT_FOUND)
-            }
-
-            return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList })
+            const projectsByUserCourseId = await projectService.findByUserCourseId(Number(usercourseid), Number(take), Number(skip))
+            return res.status(StatusCodes.OK).json(projectsByUserCourseId)
         }
 
 
-        if(categoryid){
+        if (categoryid) {
             const projectsByCategory = await database.project.findMany({
                 where: {
                     category: {
@@ -274,21 +144,21 @@ export class ProjectController {
                 take: Number(take),
                 skip: Number(skip)
             })
-    
+
             if (projectsByCategory.length === 0) {
                 throw new ApiError('Cannot find projects for this category.', StatusCodes.NOT_FOUND)
             }
-    
+
             return res.status(StatusCodes.OK).json(projectsByCategory)
         }
-        
-        if(modality){
+
+        if (modality) {
             const [projectsList, totalProjects] = await database.$transaction([
                 database.project.findMany({
-                    where:{
+                    where: {
                         modality: modality.toString()
                     },
-                    select:{
+                    select: {
                         title: true,
                         description: true,
                         studentsRequired: true,
@@ -313,14 +183,14 @@ export class ProjectController {
                     skip: Number(skip)
                 }),
                 database.project.count()
-            ]) 
-           
-            const totalPages = Math.ceil(totalProjects / Number(take) )
+            ])
+
+            const totalPages = Math.ceil(totalProjects / Number(take))
 
             if (projectsList.length === 0) {
                 throw new ApiError('Cannot find projects for this modality.', StatusCodes.NOT_FOUND)
             }
-            return res.status(StatusCodes.OK).json({totalProjects, totalPages, projectsList})
+            return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList })
 
         }
 
@@ -352,7 +222,7 @@ export class ProjectController {
         } else {
             return res.status(StatusCodes.OK).json(projects)
         }
-        
+
     }
 
     async update(req: Request, res: Response) {
@@ -400,7 +270,7 @@ export class ProjectController {
 
         const totalPages = Math.ceil(totalProjects / Number(take))
 
-        return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList})
+        return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList })
     }
 
     async delete(req: Request, res: Response) {
@@ -441,6 +311,6 @@ export class ProjectController {
         const totalPages = Math.ceil(totalProjects) / Number(take)
 
         return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList })
-    
+
     }
 }
