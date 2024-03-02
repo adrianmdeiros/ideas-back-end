@@ -4,60 +4,35 @@ import { StatusCodes } from 'http-status-codes'
 import { ApiError } from "../helpers/ApiError";
 import { ProjectService } from "../services/ProjectService";
 import { ProjectRepository } from "../repositories/ProjectRepository";
+import { UserRepository } from "../repositories/UserRepository";
+import { UserService } from "../services/UserService";
 
 export class ProjectController {
-    
-    async create(req: Request, res: Response) {
+    public async create(req: Request, res: Response) {
         const { title, description, studentsRequired, modality, userid, categoryid } = req.body
 
         if (!userid || !categoryid) {
             throw new ApiError('userid or categoryid is missing!', StatusCodes.BAD_REQUEST)
         }
 
-        const user = await database.user.findFirst({
-            where: {
-                id: userid
-            }
-        })
-
+        const userService = new UserService(new UserRepository)
+        const user = await userService.findById(userid)
         if (!user) {
-            throw new ApiError('User not found.', StatusCodes.NOT_FOUND)
+            throw new ApiError("User doesn't exists.", StatusCodes.BAD_REQUEST)
         }
 
-        const savedProject = await database.project.create({
-            data: {
-                title,
-                description,
-                studentsRequired,
-                modality,
-                user: {
-                    connect: {
-                        id: userid,
-                    }
-                },
-                category: {
-                    connect: {
-                        id: categoryid
-                    }
-                }
-            },
-            select: {
-                id: true,
-                title: true,
-                description: true,
-                studentsRequired: true,
-                modality: true,
-                category: true,
-                user: {
-                    select: {
-                        name: true,
-                        course: true,
-                        email: true,
-                        phone: true
-                    }
-                }
-            }
-        })
+        const projectIdea = {
+            title,
+            description,
+            studentsRequired,
+            modality,
+            userid,
+            categoryid
+        }
+
+        const projectService = new ProjectService(new ProjectRepository())
+
+        const savedProject = await projectService.save(projectIdea)
 
         return res.status(StatusCodes.CREATED).json(savedProject)
     }
@@ -68,7 +43,7 @@ export class ProjectController {
         const skip = req.query.skip ?? 0
         const take = req.query.take ?? 12
 
-        const projectService = new ProjectService(new ProjectRepository());
+        const projectService = new ProjectService(new ProjectRepository())
 
         if (usercourseid && categoryid) {
             const projectsByUserCourseAndCategory = await projectService.findBy(Number(usercourseid), Number(categoryid), Number(take), Number(skip))
@@ -76,32 +51,7 @@ export class ProjectController {
         }
 
         if (id) {
-            const projectById = await database.project.findFirst({
-                where: {
-                    id: id
-                },
-                select: {
-                    title: true,
-                    description: true,
-                    studentsRequired: true,
-                    modality: true,
-                    category: true,
-                    user: {
-                        select: {
-                            name: true,
-                            course: true,
-                            email: true,
-                            phone: true
-                        }
-                    }
-                },
-                take: Number(take),
-                skip: Number(skip)
-            })
-
-            if (!projectById) {
-                throw new ApiError('Cannot find any project for this id.', StatusCodes.NOT_FOUND)
-            }
+            const projectById = await projectService.findById(id)
             return res.status(StatusCodes.OK).json(projectById)
         }
 
@@ -153,75 +103,12 @@ export class ProjectController {
         }
 
         if (modality) {
-            const [projectsList, totalProjects] = await database.$transaction([
-                database.project.findMany({
-                    where: {
-                        modality: modality.toString()
-                    },
-                    select: {
-                        title: true,
-                        description: true,
-                        studentsRequired: true,
-                        modality: true,
-                        category: {
-                            select: {
-                                name: true,
-                                color: true
-                            }
-                        },
-                        user: {
-                            select: {
-                                id: true,
-                                name: true,
-                                course: true,
-                                email: true,
-                                phone: true
-                            }
-                        }
-                    },
-                    take: Number(take),
-                    skip: Number(skip)
-                }),
-                database.project.count()
-            ])
-
-            const totalPages = Math.ceil(totalProjects / Number(take))
-
-            if (projectsList.length === 0) {
-                throw new ApiError('Cannot find projects for this modality.', StatusCodes.NOT_FOUND)
-            }
-            return res.status(StatusCodes.OK).json({ totalProjects, totalPages, projectsList })
-
+            const projectsByModality = await projectService.findByModality(String(modality), Number(take), Number(skip))
+            return res.status(StatusCodes.OK).json(projectsByModality)
         }
 
-        const projects = await database.project.findMany({
-            select: {
-                title: true,
-                description: true,
-                studentsRequired: true,
-                modality: true,
-                category: {
-                    select: {
-                        name: true,
-                        color: true
-                    }
-                },
-                user: {
-                    select: {
-                        name: true,
-                        course: true
-                    }
-                }
-            },
-            take: Number(take),
-            skip: Number(skip)
-        })
-
-        if (projects.length === 0) {
-            throw new ApiError("Cannot find any projects.", StatusCodes.NOT_FOUND)
-        } else {
-            return res.status(StatusCodes.OK).json(projects)
-        }
+        const allProjectsIdeas = await projectService.all(Number(take), Number(skip))
+        return res.status(StatusCodes.OK).json(allProjectsIdeas)
 
     }
 

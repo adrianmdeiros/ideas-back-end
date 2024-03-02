@@ -3,7 +3,7 @@ import { database } from '../database'
 import { StatusCodes } from 'http-status-codes'
 import { ApiError } from '../helpers/ApiError'
 
-// Serializar BigInt - bugfix
+// Serializar BigInt - Prisma ORM bugfix
 declare global {
     interface BigInt {
         toJSON(): string
@@ -68,7 +68,6 @@ export class UserController {
                 email: true,
                 phone: true,
                 bond: true,
-                courseId: true,
                 course: true
             }
         })
