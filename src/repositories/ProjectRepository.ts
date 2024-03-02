@@ -24,24 +24,7 @@ export class ProjectRepository {
 
     public async all(take: number, skip: number) {
         const projects = await database.project.findMany({
-            select: {
-                title: true,
-                description: true,
-                studentsRequired: true,
-                modality: true,
-                category: {
-                    select: {
-                        name: true,
-                        color: true
-                    }
-                },
-                user: {
-                    select: {
-                        name: true,
-                        course: true
-                    }
-                }
-            },
+            select: this.queryTemplate,
             take,
             skip
         })
@@ -77,7 +60,10 @@ export class ProjectRepository {
                     id: id
                 }
             },
-            select: this.queryTemplate,
+            select: {
+                id: true,
+                ...this.queryTemplate
+            },
             take,
             skip
         })
