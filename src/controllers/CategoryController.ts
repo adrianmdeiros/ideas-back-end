@@ -3,17 +3,15 @@ import { Request, Response } from "express";
 import { database } from "../database";
 import { StatusCodes } from 'http-status-codes'
 import { ApiError } from "../helpers/ApiError";
+import { FindAllCategoriesService } from "../services/FindAllCategoriesService";
+import { CategoryRepository } from "../repositories/CategoryRepository";
 
 export class CategoryController {
     async read(req: Request, res: Response) {
-        const categories = await database.category.findMany({
-            orderBy: {
-                id: 'desc'
-            }
-        })
-        if (categories.length === 0) {
-            throw new ApiError('Cannot find categories.', StatusCodes.NOT_FOUND)
-        }
+        
+        const categoryService = new FindAllCategoriesService(new CategoryRepository())
+        const categories = await categoryService.all()
+
         return res.status(StatusCodes.OK).json(categories)
     }
 }

@@ -22,11 +22,9 @@ export class ProjectRepository {
         }
     }
 
-    public async all(take: number, skip: number) {
+    public async findAll() {
         const projects = await database.project.findMany({
-            select: this.queryTemplate,
-            take,
-            skip
+            select: this.queryTemplate
         })
 
         if (isListEmpty(projects)) {
@@ -37,24 +35,23 @@ export class ProjectRepository {
 
     }
 
-
     public async findById(id: string) {
-        const project = await database.project.findFirst({
+        const projectById = await database.project.findFirst({
             where: {
                 id: id
             },
             select: this.queryTemplate
         })
 
-        if (!project) {
+        if (!projectById) {
             throw new ApiError('Cannot find any project for this id.', StatusCodes.NOT_FOUND)
         }
 
-        return project
+        return projectById
     }
 
     public async findByUser(id: number, take: number, skip: number) {
-        const projects = await database.project.findMany({
+        const projectsByUser = await database.project.findMany({
             where: {
                 user: {
                     id: id
@@ -68,18 +65,18 @@ export class ProjectRepository {
             skip
         })
 
-        if (isListEmpty(projects)) {
+        if (isListEmpty(projectsByUser)) {
             throw new ApiError(
                 'Cannot find projects for this user.',
                 StatusCodes.NOT_FOUND
             )
         }
 
-        return projects
+        return projectsByUser
     }
 
-    public async findByUserCourseId(id: number, take: number, skip: number) {
-        const projects = await database.project.findMany({
+    public async findByUserCourse(id: number, take: number, skip: number) {
+        const projectsByUserCourse = await database.project.findMany({
             where: {
                 user: {
                     course: {
@@ -92,18 +89,18 @@ export class ProjectRepository {
             skip
         })
 
-        if (isListEmpty(projects)) {
+        if (isListEmpty(projectsByUserCourse)) {
             throw new ApiError(
                 "Cannor find projects for this usercourse.",
                 StatusCodes.NOT_FOUND
             )
         }
 
-        return projects
+        return projectsByUserCourse
     }
 
     public async findByUserCourseAndCategoryId(usercourseid: number, categoryid: number, take: number, skip: number) {
-        const projects = await database.project.findMany({
+        const projectsByUserCourseAndCategory = await database.project.findMany({
             where: {
                 user: {
                     course: {
@@ -121,52 +118,52 @@ export class ProjectRepository {
             skip
         })
 
-        if (isListEmpty(projects)) {
+        if (isListEmpty(projectsByUserCourseAndCategory)) {
             throw new ApiError(
-                "Cannot find projects for this category for your course.",
+                "Cannot find projects for this category on this course.",
                 StatusCodes.NOT_FOUND
             )
         }
 
-        return projects
+        return projectsByUserCourseAndCategory
     }
+
     public async findByModality(modality: string, take: number, skip: number) {
-        const projects = await database.project.findMany({
+        const projectsByModality = await database.project.findMany({
             where: {
                 modality: modality.toString()
             },
-            select: {
-                title: true,
-                description: true,
-                studentsRequired: true,
-                modality: true,
-                category: {
-                    select: {
-                        name: true,
-                        color: true
-                    }
-                },
-                user: {
-                    select: {
-                        id: true,
-                        name: true,
-                        course: true,
-                        email: true,
-                        phone: true
-                    }
-                }
-            },
+            select: this.queryTemplate,
             take,
             skip
         })
-        if (isListEmpty(projects)) {
+        if (isListEmpty(projectsByModality)) {
             throw new ApiError('Cannot find projects for this modality.', StatusCodes.NOT_FOUND)
         }
-        return projects
+        return projectsByModality
     }
 
-    public async save(project: Project) {
-        const savedProject = await database.project.create({
+    public async findByCategory(id: number, take: number, skip: number){
+        const projectsByCategory = await database.project.findMany({
+            where: {
+                category: {
+                    id: id
+                }
+            },
+            select: this.queryTemplate,
+            take,
+            skip
+        })
+
+        if (isListEmpty(projectsByCategory)) {
+            throw new ApiError('Cannot find projects for this category.', StatusCodes.NOT_FOUND)
+        }
+
+        return projectsByCategory
+    }
+
+    public async create(project: Project) {
+        const createdProject = await database.project.create({
             data: {
                 title: project.title,
                 description: project.description,
@@ -185,6 +182,41 @@ export class ProjectRepository {
             },
             select: this.queryTemplate
         })
-        return savedProject
+        return createdProject
     }
+
+    public async update(id: string, project: Project){
+       const updatedProject = await database.project.update({
+            where: {
+                id: id
+            },
+            data: {
+                title: project.title,
+                description: project.description,
+                studentsRequired: project.studentsRequired,
+                modality: project.modality,
+                categoryId: project.categoryid
+            },
+            select: {
+                id: true,
+                ...this.queryTemplate
+            }
+        })
+
+        return updatedProject
+    }
+
+    public async delete(id: string) {
+        const deletedProject = await database.project.delete({
+            where: {
+                id
+            },
+            select: this.queryTemplate
+        })
+
+        return deletedProject
+    }
+        
+
+
 }
