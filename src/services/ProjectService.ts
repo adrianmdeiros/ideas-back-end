@@ -48,4 +48,12 @@ export class ProjectService {
         return await this.projectRepository.delete(id)
     }
 
+    public async findByUserCourseAndModality(usercourseid: number, modality: string, take: number, skip: number){
+        return await this.projectRepository.findByUserCourseAndModality(usercourseid, modality, take, skip)
+    }
+
+    public async findByUserCourseAndCategoryAndModality(usercourseid: number, categoryid: number, modality: string, take: number, skip: number){
+        return await this.projectRepository.findByUserCourseAndCategoryAndModality(usercourseid, categoryid, modality, take, skip)
+    }
+
 }

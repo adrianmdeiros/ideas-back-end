@@ -131,7 +131,7 @@ export class ProjectRepository {
     public async findByModality(modality: string, take: number, skip: number) {
         const projectsByModality = await database.project.findMany({
             where: {
-                modality: modality.toString()
+                modality: String(modality).toLowerCase()
             },
             select: this.queryTemplate,
             take,
@@ -143,7 +143,7 @@ export class ProjectRepository {
         return projectsByModality
     }
 
-    public async findByCategory(id: number, take: number, skip: number){
+    public async findByCategory(id: number, take: number, skip: number) {
         const projectsByCategory = await database.project.findMany({
             where: {
                 category: {
@@ -168,7 +168,7 @@ export class ProjectRepository {
                 title: project.title,
                 description: project.description,
                 studentsRequired: project.studentsRequired,
-                modality: project.modality,
+                modality: project.modality.toLowerCase(),
                 user: {
                     connect: {
                         id: project.userid,
@@ -185,8 +185,8 @@ export class ProjectRepository {
         return createdProject
     }
 
-    public async update(id: string, project: Project){
-       const updatedProject = await database.project.update({
+    public async update(id: string, project: Project) {
+        const updatedProject = await database.project.update({
             where: {
                 id: id
             },
@@ -216,7 +216,46 @@ export class ProjectRepository {
 
         return deletedProject
     }
-        
 
+    public async findByUserCourseAndModality(usercourseid: number, modality: string, take: number, skip: number) {
+        const projectsByUserCourseAndModality = await database.project.findMany({
+            where: {
+                user: {
+                    course: {
+                        id: usercourseid
+                    }
+                },
+                AND: {
+                    modality: String(modality).toLowerCase()
+                }
+            },
+            select: this.queryTemplate,
+            take,
+            skip
+        })
+        return projectsByUserCourseAndModality
+    }
+
+    public async findByUserCourseAndCategoryAndModality(usercourseid: number, categoryid: number, modality: String, take: number, skip: number) {
+        const projectsByUserCourseAndCategoryAndModality = await database.project.findMany({
+            where: {
+                user: {
+                    course: {
+                        id: usercourseid
+                    }
+                },
+                AND: {
+                    category: {
+                        id: categoryid
+                    },
+                    modality: String(modality).toLowerCase()
+                },
+            },
+            select: this.queryTemplate,
+            take,
+            skip
+        })
+        return projectsByUserCourseAndCategoryAndModality
+    }
 
 }

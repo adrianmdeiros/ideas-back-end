@@ -43,9 +43,19 @@ export class ProjectController {
 
         const projectService = new ProjectService(new ProjectRepository())
 
+        if(usercourseid && categoryid && modality){
+            const projects = await projectService.findByUserCourseAndCategoryAndModality(Number(usercourseid), Number(categoryid), String(modality), Number(take), Number(skip))
+            return res.status(StatusCodes.OK).json(projects)
+        }
+
         if (usercourseid && categoryid) {
             const projects = await projectService
                 .findBy(Number(usercourseid), Number(categoryid), Number(take), Number(skip))
+            return res.status(StatusCodes.OK).json(projects)
+        }
+
+        if(usercourseid && modality){
+            const projects = await projectService.findByUserCourseAndModality(Number(usercourseid), String(modality), Number(take), Number(skip))
             return res.status(StatusCodes.OK).json(projects)
         }
 
@@ -59,7 +69,7 @@ export class ProjectController {
                 .findByUser(Number(userid), Number(take), Number(skip))
             return res.status(StatusCodes.OK).json(projects)
         }
-
+        
         if (usercourseid) {
             const projects = await projectService
                 .findByUserCourse(Number(usercourseid), Number(take), Number(skip))
@@ -78,6 +88,7 @@ export class ProjectController {
             return res.status(StatusCodes.OK).json(projects)
         }
 
+        
         const projects = await projectService.all()
 
         return res.status(StatusCodes.OK).json(projects)
