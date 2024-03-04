@@ -209,9 +209,12 @@ export class ProjectRepository {
     public async delete(id: string) {
         const deletedProject = await database.project.delete({
             where: {
-                id
+                id: id
             },
-            select: this.queryTemplate
+            select: {
+                id: true,
+                ...this.queryTemplate
+            }
         })
 
         return deletedProject
