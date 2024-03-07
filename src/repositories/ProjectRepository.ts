@@ -180,7 +180,10 @@ export class ProjectRepository {
                     }
                 }
             },
-            select: this.queryTemplate
+            select: {
+                id: true,
+                ...this.queryTemplate
+            } 
         })
         return createdProject
     }
