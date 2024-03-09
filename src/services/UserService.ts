@@ -12,11 +12,11 @@ export class UserService {
     }
 
     public async findBy(id: number) {
-        return await this.userRepository.findBy(id)
+        return await this.userRepository.findById(id)
     }
 
-    public async create(user: User){
-        return await this.userRepository.create(user)
+    public async save(user: User){
+        return await this.userRepository.save(user)
     }
 
     public async findContacts(userid: number){

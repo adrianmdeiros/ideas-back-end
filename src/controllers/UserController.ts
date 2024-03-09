@@ -29,7 +29,7 @@ export class UserController {
         }
 
         const userService = new UserService(new UserRepository())
-        const userCreated = await userService.create(user)
+        const userCreated = await userService.save(user)
 
         return res.status(StatusCodes.CREATED).json(userCreated)
 

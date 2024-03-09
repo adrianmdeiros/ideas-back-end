@@ -9,54 +9,101 @@ datasource db {
 }
 
 model User {
-  id        BigInt    @id
-  name      String
-  email     String?   @unique
-  phone     String?   @unique
-  // avatarURL String
-  bond      String
-  courseId  Int
+  id    BigInt   @id
+  name  String
+  email String?  @unique
+  phone String?  @unique
+  bond  BondType
 
-  projects  Project[]
-  course    Course?  @relation(fields: [courseId], references: [id])
+  student Student?
+  servent Servant?
 
   @@map("users")
+}
+
+enum BondType {
+  Student
+  Servant
+}
+
+model Student {
+  studentId BigInt @id
+  user      User   @relation(fields: [studentId], references: [id])
+
+  courseId Int
+  course   Course @relation(fields: [courseId], references: [id])
+
+  @@index([studentId])
   @@index([courseId])
-}
-
-model Project {
-  id               String   @id @default(uuid())
-  title            String   @unique
-  description      String   @db.VarChar(1000)
-  studentsRequired Int
-  amountUsersInterested BigInt? @default(0)
-  modality         String?
-  userId           BigInt
-  categoryId       Int
-  createdAt        DateTime @default(now())
-
-  user             User     @relation(fields: [userId], references: [id])
-  category         Category @relation(fields: [categoryId], references: [id])
-  
-
-  @@index([userId])
-  @@index([categoryId])
-  @@map("projects")
-}
-
-model Category {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  color    String    @unique
-
-  projects Project[]
-
-  @@map("categories")
+  @@map("students")
 }
 
 model Course {
   id       Int       @id @default(autoincrement())
   name     String    @unique
+  students Student[]
 
-  users User[]
+  @@map("courses")
+}
+
+model Servant {
+  servantId BigInt @id
+  user      User   @relation(fields: [servantId], references: [id])
+
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  Project Project[]
+
+  @@index([servantId])
+  @@index([departmentId])
+  @@map("servants")
+}
+
+model Department {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  servents Servant[]
+
+  @@map("departments")
+}
+
+model Project {
+  id               String @id @default(uuid())
+  title            String @unique
+  description      String @db.VarChar(1000)
+  studentsRequired Int
+
+  modality   Modality @relation(fields: [modalityId], references: [id])
+  modalityId Int
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  servant   Servant @relation(fields: [servantId], references: [servantId])
+  servantId BigInt
+
+  @@index([modalityId])
+  @@index([categoryId])
+  @@index([servantId])
+  @@map("projects")
+}
+
+model Modality {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  Project Project[]
+
+  @@map("modalities")
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  projects Project[]
+
+  @@map("categories")
 }

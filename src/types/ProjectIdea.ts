@@ -1,8 +1,8 @@
-export type Project = {
+export type ProjectIdea = {
     title: string
     description: string
     studentsRequired: number
     modality: string
-    userid: number
-    categoryid: number
+    category: string
+    serventId: number
 }

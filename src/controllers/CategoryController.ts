@@ -1,8 +1,6 @@
 
 import { Request, Response } from "express";
-import { database } from "../database";
 import { StatusCodes } from 'http-status-codes'
-import { ApiError } from "../helpers/ApiError";
 import { FindAllCategoriesService } from "../services/FindAllCategoriesService";
 import { CategoryRepository } from "../repositories/CategoryRepository";
 
