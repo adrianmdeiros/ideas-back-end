@@ -1,5 +1,6 @@
 import { ProjectIdea } from "../types/ProjectIdea";
 import { ProjectIdeasRepository } from "../repositories/ProjectIdeasRepository";
+import { ProjectIdeaToUpdate } from "../types/ProjectIdeaToUpdate";
 
 export class ProjectIdeasService {
     constructor(
@@ -30,7 +31,7 @@ export class ProjectIdeasService {
         return await this.projectIdeasRepository.create(projectIdea)
     }
 
-    public async update(id: string, projectIdea: ProjectIdea){
+    public async update(id: string, projectIdea: ProjectIdeaToUpdate){
         return await this.projectIdeasRepository.update(id, projectIdea)
     }
 

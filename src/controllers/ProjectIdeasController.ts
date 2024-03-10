@@ -8,16 +8,18 @@ import { ServantRepository } from "../repositories/ServantRepository";
 
 export class ProjectIdeasController {
     async create(req: Request, res: Response) {
-        const { title, description, studentsRequired, modality, category, serventId } = req.body
+        const { title, description, studentsRequired, modality, category, servantId } = req.body
 
-        if (!serventId) {
-            throw new ApiError('serventId is missing!', StatusCodes.BAD_REQUEST)
+        if (!servantId) {
+            throw new ApiError('servantId is missing!', StatusCodes.BAD_REQUEST)
         }
 
-        const servent = new FindServantByIdService(new ServantRepository())
+        const findServantByIdService = new FindServantByIdService(new ServantRepository())
 
-        if (!servent) {
-            throw new ApiError("Servent doesn't exists.", StatusCodes.BAD_REQUEST)
+        const servant = await findServantByIdService.findById(servantId)
+
+        if (!servant) {
+            throw new ApiError("Servant doesn't exists.", StatusCodes.BAD_REQUEST)
         }
 
         const projectIdea = {
@@ -26,7 +28,7 @@ export class ProjectIdeasController {
             studentsRequired,
             modality,
             category,
-            serventId
+            servantId
         }
 
         const projectIdeasService = new ProjectIdeasService(new ProjectIdeasRepository())
@@ -36,7 +38,7 @@ export class ProjectIdeasController {
     }
 
     async read(req: Request, res: Response) {
-        const { id, serventId } = req.query
+        const { id, servantId } = req.query
 
         const projectIdeasService = new ProjectIdeasService(new ProjectIdeasRepository())
 
@@ -45,10 +47,10 @@ export class ProjectIdeasController {
             return res.status(StatusCodes.OK).json(projectIdeaById)
         }
 
-        if (serventId) {
-            const projectIdeasByServent = await projectIdeasService
-                .findByServant(Number(serventId))
-            return res.status(StatusCodes.OK).json(projectIdeasByServent)
+        if (servantId) {
+            const projectIdeasByServant = await projectIdeasService
+                .findByServant(Number(servantId))
+            return res.status(StatusCodes.OK).json(projectIdeasByServant)
         }
 
         const allProjectIdeas = await projectIdeasService.all()
@@ -59,15 +61,14 @@ export class ProjectIdeasController {
 
     async update(req: Request, res: Response) {
         const { id } = req.params
-        const { title, description, studentsRequired, modality, category, serventId } = req.body
+        const { title, description, studentsRequired, modality, category } = req.body
 
         const newDataProjectIdea = {
             title,
             description,
             studentsRequired,
             modality,
-            category,
-            serventId
+            category
         }
 
         const projectIdeasService = new ProjectIdeasService(new ProjectIdeasRepository())

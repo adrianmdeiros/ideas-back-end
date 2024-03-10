@@ -75,7 +75,7 @@ model Project {
   description      String @db.VarChar(1000)
   studentsRequired Int
 
-  modality   Modality @relation(fields: [modalityId], references: [id])
+  modality   Modality? @relation(fields: [modalityId], references: [id])
   modalityId Int
 
   category   Category @relation(fields: [categoryId], references: [id])

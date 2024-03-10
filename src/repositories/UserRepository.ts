@@ -76,7 +76,7 @@ export class UserRepository {
             throw new ApiError('userId is required.', StatusCodes.BAD_REQUEST)
         }
 
-        if (contacts.email || contacts.phone) {
+        if (contacts.email || contacts.phone || contacts.email == '' || contacts.phone == '') {
             const updatedContacts = await database.user.update({
                 where: {
                     id: userId
@@ -92,9 +92,7 @@ export class UserRepository {
             throw new ApiError('Email or Phone are required.', StatusCodes.BAD_REQUEST)
         }
 
-
     }
-
 
 
 } 

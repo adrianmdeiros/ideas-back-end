@@ -3,6 +3,7 @@ import { database } from "../database";
 import { ApiError } from "../helpers/ApiError";
 import { isListEmpty } from "../utils/isListEmpty";
 import { ProjectIdea } from "../types/ProjectIdea";
+import { ProjectIdeaToUpdate } from "../types/ProjectIdeaToUpdate";
 // import { Modality } from "../types/Modality";
 // import { Category } from "../types/Category";
 
@@ -23,7 +24,7 @@ export class ProjectIdeasRepository {
             }
         },
         servant: {
-            select:{
+            select: {
                 department: {
                     select: {
                         name: true
@@ -33,7 +34,7 @@ export class ProjectIdeasRepository {
                     select: {
                         name: true,
                         phone: true,
-                        email: true, 
+                        email: true,
                     }
                 }
             }
@@ -109,7 +110,7 @@ export class ProjectIdeasRepository {
                 },
                 servant: {
                     connect: {
-                       servantId: projectIdea.serventId
+                        servantId: projectIdea.servantId
                     }
                 }
             },
@@ -122,7 +123,7 @@ export class ProjectIdeasRepository {
         return createdProjectIdea
     }
 
-    public async update(id: string, projectIdea: ProjectIdea) {
+    public async update(id: string, projectIdea: ProjectIdeaToUpdate) {
         const updatedProjectIdea = await database.project.update({
             where: {
                 id: id
@@ -132,12 +133,12 @@ export class ProjectIdeasRepository {
                 description: projectIdea.description,
                 studentsRequired: projectIdea.studentsRequired,
                 modality: {
-                    update: {
+                    connect: {
                         name: projectIdea.modality
                     }
                 },
                 category: {
-                    update: {
+                    connect: {
                         name: projectIdea.category
                     }
                 }
