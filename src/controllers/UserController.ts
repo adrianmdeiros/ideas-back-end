@@ -52,10 +52,10 @@ export class UserController {
     }
 
     async readContacts(req: Request, res: Response) {
-        const { userid } = req.query
+        const { userId } = req.query
 
         const userService = new UserService(new UserRepository())
-        const userContacts = await userService.findContacts(Number(userid))
+        const userContacts = await userService.findContacts(Number(userId))
         
         return res.status(StatusCodes.OK).json(userContacts)
 

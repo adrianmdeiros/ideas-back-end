@@ -19,8 +19,8 @@ export class UserService {
         return await this.userRepository.save(user)
     }
 
-    public async findContacts(userid: number){
-        return await this.userRepository.findContacts(userid)
+    public async findContacts(userId: number){
+        return await this.userRepository.findContacts(userId)
     }
 
     public async update(contacts: UserContacts, userid: number){
