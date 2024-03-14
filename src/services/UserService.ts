@@ -23,7 +23,7 @@ export class UserService {
         return await this.userRepository.findContacts(userId)
     }
 
-    public async update(contacts: UserContacts, userid: number){
-        return await this.userRepository.update(contacts, userid)
+    public async update(contacts: UserContacts, userId: number){
+        return await this.userRepository.update(contacts, userId)
     }
 }

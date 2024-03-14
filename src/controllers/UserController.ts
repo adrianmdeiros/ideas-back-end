@@ -63,7 +63,7 @@ export class UserController {
 
     async updateContacts(req: Request, res: Response) {
         const { email, phone } = req.body
-        const { userid } = req.query
+        const { userId } = req.query
 
         const contacts = {
             email,
@@ -71,7 +71,7 @@ export class UserController {
         }
 
         const userService = new UserService(new UserRepository())
-        const updatedContacts = await userService.update(contacts, Number(userid))
+        const updatedContacts = await userService.update(contacts, Number(userId))
         
         return res.status(StatusCodes.OK).json(updatedContacts)
     }
