@@ -6,15 +6,16 @@ import routes from './routes'
 
 const app = express()
 const port = process.env.PORT || 3000
+
 const corsOptions = {
-    origin: 'https://projif.vercel.app',
+    origin: process.env.CORS_ORIGIN_URL,
     optionsSuccessStatus: 200
 }
 
 app.get('/', (req, res) => res.send('PROJIF-API'))
 
 app.use(express.json())
-app.use(cors(corsOptions))     
+app.use(cors(corsOptions))
 app.use(routes)
 app.use(errorMiddleware)
 
